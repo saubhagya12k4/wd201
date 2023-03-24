@@ -1,3 +1,7 @@
+/* eslint-disable no-undef */
+/* eslint-disable linebreak-style */
+/* eslint-disable max-len */
+/* eslint-disable linebreak-style */
 const todoList = () => {
   all = [];
   const add = (todoItem) => {
@@ -6,41 +10,18 @@ const todoList = () => {
   const markAsComplete = (index) => {
     all[index].completed = true;
   };
-
   const overdue = () => {
-    const aa = all.filter(
-      (item) => item.dueDate.split("-")[2] < new Date().getDate()
-    );
-    return aa;
+    return all.filter((item) => item.dueDate < today);
   };
-
   const dueToday = () => {
-    const bb = all.filter(
-      (item) => item.dueDate.split("-")[2] === String(new Date().getDate())
-    );
-    return bb;
+    return all.filter((item) => item.dueDate == today);
   };
-
   const dueLater = () => {
-    const bb = all.filter(
-      (item) => item.dueDate.split("-")[2] > new Date().getDate()
-    );
-    return bb;
+    return all.filter((item) => item.dueDate > today);
   };
-
   const toDisplayableList = (list) => {
-    const final_result = list.map(
-      (item) =>
-        `${item.completed ? "[x]" : "[ ]"} ${item.title} ${
-          item.dueDate.split("-")[2] === String(new Date().getDate())
-            ? ""
-            : item.dueDate
-        }`
-    );
-
-    return final_result.join("\n");
+    return list.map((item) => `${item.completed ? '[x]':'[ ]'} ${item.title} ${item.dueDate == today ? '' : item.dueDate}`).join('\n');
   };
-
   return {
     all,
     add,
@@ -51,4 +32,5 @@ const todoList = () => {
     toDisplayableList,
   };
 };
+const today = new Date().toISOString().split('T')[0];
 module.exports = todoList;
