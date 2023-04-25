@@ -1,29 +1,67 @@
 "use strict";
-const { Model } = require("sequelize");
+const { Model, Op } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Todo extends Model {
+  class Todos extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
-      // define association here
+    static async overdue() {
+      const overdueTodos = await Todos.findAll({
+        where: {
+          dueDate: { [Op.lt]: new Date() },
+        },
+      });
+
+      return overdueTodos;
     }
-    static addTodo({ title, dueDate }) {
-      return this.create({ title: title, dueDate: dueDate, completed: false });
+
+    static async dueToday() {
+      const dueTodayTodos = await Todos.findAll({
+        where: {
+          dueDate: { [Op.eq]: new Date() },
+        },
+      });
+
+      return dueTodayTodos;
     }
-    static getTodos() {
+
+    static async dueLater() {
+      const dueLaterTodos = await Todos.findAll({
+        where: {
+          dueDate: { [Op.gt]: new Date() },
+        },
+      });
+
+      return dueLaterTodos;
+    }
+
+    static async getTodos() {
       return this.findAll();
     }
-    static deleteAll() {
-      this.destroy({ where: {} });
+    static async addTodo({ title, dueDate }) {
+      return this.create({ title: title, dueDate: dueDate, completed: false });
+    }
+    static async remove(id) {
+      return this.destroy({
+        where: {
+          id: id,
+        },
+      });
     }
     markAsCompleted() {
       return this.update({ completed: true });
     }
+    setCompletionStatus(bool) {
+      return this.update({ completed: bool });
+    }
+    // eslint-disable-next-line no-unused-vars
+    static associate(models) {
+      // define association here
+    }
   }
-  Todo.init(
+  Todos.init(
     {
       title: DataTypes.STRING,
       dueDate: DataTypes.DATEONLY,
@@ -31,8 +69,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Todo",
+      modelName: "Todos",
     }
   );
-  return Todo;
+  return Todos;
 };
