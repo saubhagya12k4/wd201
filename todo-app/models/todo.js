@@ -8,19 +8,19 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static async overdue() {
-      const overdueTodos = await Todos.findAll({
+      return this.findAll({
         where: {
           dueDate: { [Op.lt]: new Date() },
+          completed:false,
         },
       });
-
-      return overdueTodos;
     }
 
     static async dueToday() {
       const dueTodayTodos = await Todos.findAll({
         where: {
           dueDate: { [Op.eq]: new Date() },
+          completed:false,
         },
       });
 
@@ -31,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       const dueLaterTodos = await Todos.findAll({
         where: {
           dueDate: { [Op.gt]: new Date() },
+          completed:false,
         },
       });
 
@@ -54,7 +55,15 @@ module.exports = (sequelize, DataTypes) => {
       return this.update({ completed: true });
     }
     setCompletionStatus(bool) {
-      return this.update({ completed: bool });
+      return this.update({ completed: true });
+    }
+
+    static async completed(){
+      return this.findAll({
+        where:{
+          completed:true,
+        },
+      });
     }
     // eslint-disable-next-line no-unused-vars
     static associate(models) {
