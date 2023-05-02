@@ -7,43 +7,64 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static async overdue() {
-      return this.findAll({
-        where: {
-          dueDate: { [Op.lt]: new Date() },
-          completed:false,
-        },
-      });
+
+    static async addTodo({ title, dueDate }) {
+      return this.create({ title: title, dueDate: dueDate, completed: false });
     }
 
-    static async dueToday() {
-      const dueTodayTodos = await Todos.findAll({
-        where: {
-          dueDate: { [Op.eq]: new Date() },
-          completed:false,
-        },
-      });
 
-      return dueTodayTodos;
+    markAsCompleted() {
+      return this.update({ completed: true });
     }
 
-    static async dueLater() {
-      const dueLaterTodos = await Todos.findAll({
-        where: {
-          dueDate: { [Op.gt]: new Date() },
-          completed:false,
-        },
-      });
-
-      return dueLaterTodos;
+    deletetodo(){
+      return this.update({ completed: true});
     }
 
     static async getTodos() {
       return this.findAll();
     }
-    static async addTodo({ title, dueDate }) {
-      return this.create({ title: title, dueDate: dueDate, completed: false });
+
+    static async overdue() {
+      return this.findAll({
+        where: {
+          dueDate: { [Op.lt]: new Date() },
+          completed: false,
+        },
+      });
     }
+
+    static async dueToday() {
+      return this.findAll({
+        where: {
+          dueDate: { [Op.eq]: new Date() },
+          completed: false,
+        },
+      });
+    }
+
+    static async dueLater() {
+      return this.findAll({
+        where: {
+          dueDate: { [Op.gt]: new Date() },
+          completed: false,
+        },
+      });
+    }
+
+    static async completed() {
+      return this.findAll({
+        where: {
+          completed: true,
+        },
+      });
+    }   
+ 
+    setCompletionStatus(bool) {
+      return this.update({ completed: bool });
+    }
+ 
+
     static async remove(id) {
       return this.destroy({
         where: {
@@ -51,20 +72,9 @@ module.exports = (sequelize, DataTypes) => {
         },
       });
     }
-    markAsCompleted() {
-      return this.update({ completed: true });
-    }
-    setCompletionStatus(bool) {
-      return this.update({ completed: true });
-    }
-
-    static async completed(){
-      return this.findAll({
-        where:{
-          completed:true,
-        },
-      });
-    }
+    
+    
+    
     // eslint-disable-next-line no-unused-vars
     static associate(models) {
       // define association here
