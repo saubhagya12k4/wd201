@@ -85,7 +85,7 @@ describe("List the todo items", function () {
         completed: false,
       });
     const parsedUpdateResponse2 = JSON.parse(markInCompleteResponse.text);
-    expect(parsedUpdateResponse2.completed).toBe(true);
+    expect(parsedUpdateResponse2.completed).toBe(false);
   });
 
   test("Deleting a Todo", async () => {
