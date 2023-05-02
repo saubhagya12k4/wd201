@@ -3,36 +3,41 @@ const app = express();
 const db = require("./models/index");
 var csrf = require("tiny-csrf");
 const bodyParser = require("body-parser");
-var cookieParser = require("cookie-parser");
-app.use(bodyParser.json());
 const path = require("path");
+var cookieParser = require("cookie-parser");
+
 // const { Todos } = require("./models");
 // eslint-disable-next-line no-unused-vars
-const todo = require("./models/todo");
 app.use(express.static(path.join(__dirname, "public")));
+app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser("shh! some secret string"));
 app.use(csrf("this_should_be_32_character_long", ["POST", "PUT", "DELETE"]));
 
 app.set("view engine", "ejs");
 app.get("/", async (request, response) => {
-  const allTodos = await db.Todos.getTodos();
-  const overdue = await db.Todos.overdue();
-  const dueLater = await db.Todos.dueLater();
-  const dueToday = await db.Todos.dueToday();
-  const completed = await db.Todos.completed();
-  if (request.accepts("html")) {
-    response.render("index", {
-      title: "Todo Application",
-      allTodos,
-      overdue,
-      dueLater,
-      dueToday,
-      completed,
-      csrfToken: request.csrfToken(),
-    });
-  } else {
-    response.json({ overdue, dueLater, dueToday, completed });
+  try {
+    const allTodos = await db.Todos.getTodos();
+    const overdue = await db.Todos.overdue();
+    const dueLater = await db.Todos.dueLater();
+    const dueToday = await db.Todos.dueToday();
+    const completed = await db.Todos.completed();
+    if (request.accepts("html")) {
+      response.render("index", {
+        title: "Todo Application",
+        allTodos,
+        overdue,
+        dueLater,
+        dueToday,
+        completed,
+        csrfToken: request.csrfToken(),
+      });
+    } else {
+      response.json({ overdue, dueLater, dueToday, completed });
+    }  
+  } catch (error) {
+    console.log(error);
+    return response.status(422).json(error);
   }
 });
 
@@ -42,15 +47,6 @@ app.get("/todos", async (request, response) => {
   try {
     const todoslist = await db.Todos.findAll();
     return response.json(todoslist);
-  } catch (error) {
-    console.log(error);
-    return response.status(422).json(error);
-  }
-});
-app.get("/todos/:id", async function (request, response) {
-  try {
-    const todo = await db.Todos.findByPk(request.params.id);
-    return response.json(todo);
   } catch (error) {
     console.log(error);
     return response.status(422).json(error);
